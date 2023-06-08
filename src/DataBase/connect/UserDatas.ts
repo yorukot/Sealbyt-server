@@ -1,19 +1,48 @@
 import { Client } from 'cassandra-driver';
 
-const cassandraConfig = {
+const cassandra_config = {
   contactPoints: ['127.0.0.1'],
   localDataCenter: 'datacenter1',
   keyspace: 'userdatas',
 };
 
-const UsersDatasClient = new Client(cassandraConfig);
+const user_datas_client = new Client(cassandra_config);
 
-UsersDatasClient.connect().then(() => {
+user_datas_client.connect().then(() => {
   console.log('Connected to Cassandra - UserDatas');
 });
 
-export default UsersDatasClient;
+export default user_datas_client;
 
-//CREATE TABLE users (id text, email text, name text, password text, createat timestamp, twofactor text, PRIMARY KEY(id, createat));
-//CREATE INDEX users_email_index ON users (email);
-//INSERT INTO users (id, language, name, email, password, craeteat, twofactor) VALUES (1111, 'zh-TW', 'nightcat', 'ben.hrc57@gmail.com', 'BEN20071020', null);
+/*
+創建KEYSPACE
+CREATE KEYSPACE userdatas WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+使用者資料TABLE
+CREATE TABLE users (
+  id bigint,
+  email text,
+  displayName text,
+  password text,
+  name text,
+  createAt timestamp,
+  status int,
+  avatar text,
+  twoFactorKey text,
+  factor int,
+  PRIMARY KEY(id, email)
+);
+
+CREATE INDEX user_name_idx ON users (name);
+CREATE INDEX user_email_idx ON users (email);
+//
+
+CREATE TABLE relationship (
+  userId bigint,
+  receiveId bigint,
+  status int,
+  createAt timestamp,
+  PRIMARY KEY(userId, receiveId)
+)
+
+*/

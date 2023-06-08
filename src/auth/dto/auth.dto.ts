@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString, ValidateIf } from 'class-validator';
+import { IsEmail, IsString, ValidateIf } from 'class-validator';
 
 export class AuthDto {
   @IsEmail()
@@ -11,6 +11,8 @@ export class LogInUserDto {
   @IsString()
   id: string;
   @IsString()
+  name: string;
+  @IsString()
   password: string;
 }
 
@@ -21,15 +23,12 @@ export class SingUpDto {
   password: string;
   @IsString()
   name: string;
-  @IsNumber()
-  @ValidateIf((object, value) => value !== null)
-  twofactor: string = null;
 }
 
 export class TokenDto {
   @IsString()
-  Token: string;
+  token: string;
   @IsString()
   @ValidateIf((object, value) => value !== null)
-  Room: string = null;
+  room: string = null;
 }

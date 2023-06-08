@@ -1,1 +1,1 @@
-export * from './sendMessage.dto';
+export * from './geteway.dto';

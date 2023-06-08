@@ -6,16 +6,19 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request) => {
+          return request?.cookies?.accessToken;
+        },
+      ]),
       ignoreExpiration: true,
       secretOrKey: process.env.JWT_SECRET_KEY,
     });
   }
-
   async validate(payload: any) {
-    const nowTime = Math.floor(new Date().getTime() / 1000);
-    const hasPermission = nowTime < payload.exp;
-    if (!hasPermission) {
+    const now_time = Math.floor(new Date().getTime() / 1000);
+    const has_permission = now_time < payload.exp;
+    if (!has_permission) {
       throw new UnauthorizedException();
     }
 

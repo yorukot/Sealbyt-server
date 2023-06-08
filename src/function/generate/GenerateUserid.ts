@@ -1,19 +1,19 @@
-let sequence = 1000;
-let lastTimestamp = 0;
+let sequence = 100;
+let last_timestamp = 0;
+const epoch = new Date('2023-01-01').getTime();
 
 export default function generateUserId() {
-  const epoch = new Date('2023-01-01').getTime();
-  const currentTimestamp = Date.now();
-  const timestampPart = currentTimestamp - epoch;
-  const processid = process.pid.toString().slice(-4).padStart(4, '0');
-  if (currentTimestamp === lastTimestamp) {
+  const current_timestamp = Date.now();
+  const timestamp_part = current_timestamp - epoch;
+  const machine_id = 10;
+  if (current_timestamp === last_timestamp) {
     sequence = sequence + 1;
   } else {
-    sequence = 1000;
+    sequence = 100;
   }
 
-  lastTimestamp = currentTimestamp;
+  last_timestamp = current_timestamp;
 
-  const generateUserId = `${timestampPart}${processid}${sequence}`;
+  const generateUserId = `${timestamp_part}${machine_id}${sequence}`;
   return generateUserId;
 }
