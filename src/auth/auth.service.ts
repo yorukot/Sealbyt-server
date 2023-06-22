@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -6,11 +7,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthDto, LogInUserDto, SingUpDto } from './dto';
-import user_datas_client from 'src/DataBase/connect/UserDatas';
 import { JwtService } from '@nestjs/jwt';
 import generateUserId from 'src/function/generate/GenerateUserid';
 import { Request, Response } from 'express';
 import JwtVerifyToken from 'src/function/verify/JwtVerify';
+import FindUsersByEmail from 'src/DataBase/function/Find/users/FindByEmail';
+import FindUsersByName from 'src/DataBase/function/Find/users/FindByName';
+import createUsersData from 'src/DataBase/function/Create/users/createdata';
+import validateUsername from 'src/function/verify/UserNameVerify';
 
 @Injectable()
 export class AuthService {
@@ -18,13 +22,7 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
 
   async LogInLocal(dto: AuthDto, req: Request, res: Response) {
-    const user_query = `SELECT * FROM users WHERE email = ?`;
-    const user_parmas = [dto.email];
-    const user = (
-      await user_datas_client.execute(user_query, user_parmas, {
-        prepare: true,
-      })
-    ).rows[0];
+    const user = await FindUsersByEmail(dto.email);
     if (!user || user.password !== dto.password)
       throw new UnauthorizedException('User or password does not exist');
     const accessToken = this.LogInUser({
@@ -42,31 +40,22 @@ export class AuthService {
   }
 
   async SignUpLocal(dto: SingUpDto, req: Request, res: Response) {
-    const check_user_name_has_been_use_query = `SELECT * FROM users WHERE name = ?;`;
-    const check_user_name_has_been_use_parmas = [dto.name];
-    const user_name_has_been_use = await user_datas_client.execute(
-      check_user_name_has_been_use_query,
-      check_user_name_has_been_use_parmas,
-      { prepare: true },
-    );
-    if (user_name_has_been_use.rowLength !== 0)
+    if (!validateUsername(dto.name))
+      throw new BadRequestException(
+        'Use only letters, numbers, dot and underscores',
+      );
+    const user_name_has_been_use = await FindUsersByName(dto.name);
+    if (user_name_has_been_use)
       throw new UnauthorizedException('User name has been use');
-    const check_user_email_has_been_use_query = `SELECT * FROM users WHERE email = ?;`;
-    const check_user_email_has_been_use_parmas = [dto.email];
-    const user_eail_has_been_use = await user_datas_client.execute(
-      check_user_email_has_been_use_query,
-      check_user_email_has_been_use_parmas,
-      { prepare: true },
-    );
-    if (user_eail_has_been_use.rowLength !== 0)
+    const user_eail_has_been_use = await FindUsersByEmail(dto.email);
+    if (user_eail_has_been_use)
       throw new UnauthorizedException('User email has been use');
 
     const id = generateUserId();
-    const user_create_data_query = `INSERT INTO users (id, email, displayName, password, name, createAt, status, avatar, twoFactorKey, factor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const user_create_data_parmas = [
-      BigInt(id),
+    const user_create_data = await createUsersData(
+      id,
       dto.email,
-      null,
+      dto.name,
       dto.password,
       dto.name,
       Date.now(),
@@ -74,15 +63,8 @@ export class AuthService {
       null,
       null,
       0,
-    ];
-    const user_create_data = await user_datas_client.execute(
-      user_create_data_query,
-      user_create_data_parmas,
-      {
-        prepare: true,
-      },
     );
-    if (!user_create_data.wasApplied())
+    if (!user_create_data)
       throw new HttpException(
         'DataBase has some worng',
         HttpStatus.INTERNAL_SERVER_ERROR,

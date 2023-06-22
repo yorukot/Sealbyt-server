@@ -9,7 +9,8 @@ import { RelationshipService } from './relationship.service';
 import {
   PostRelationshipMiddleware,
   GetRelationshipMiddleware,
-} from 'src/common/middleware/relationship.middleware';
+  PutAndDeleteRelationshipMiddleware,
+} from './middleware/relationship.middleware';
 
 @Module({
   controllers: [RelationshipController],
@@ -20,6 +21,12 @@ export class RelationshipModule implements NestModule {
     consumer
       .apply(PostRelationshipMiddleware)
       .forRoutes({ path: 'relationship*', method: RequestMethod.POST });
+    consumer
+      .apply(PutAndDeleteRelationshipMiddleware)
+      .forRoutes({ path: 'relationship*', method: RequestMethod.DELETE });
+    consumer
+      .apply(PutAndDeleteRelationshipMiddleware)
+      .forRoutes({ path: 'relationship*', method: RequestMethod.PUT });
     consumer
       .apply(GetRelationshipMiddleware)
       .forRoutes({ path: 'relationship*', method: RequestMethod.GET });

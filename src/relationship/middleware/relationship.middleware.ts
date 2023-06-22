@@ -23,3 +23,12 @@ export class GetRelationshipMiddleware implements NestMiddleware {
     next();
   }
 }
+
+export class PutAndDeleteRelationshipMiddleware implements NestMiddleware {
+  use(req: Request, res: Response, next: () => void) {
+    const jwt_key: any = JwtVerifyToken(req.cookies.accessToken);
+    if (!jwt_key) throw new UnauthorizedException('Unauthorized');
+    req.user = jwt_key.id;
+    next();
+  }
+}

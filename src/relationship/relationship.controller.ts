@@ -1,20 +1,19 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Put,
+  Req,
   Res,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { RelationshipService } from './relationship.service';
-import { Response } from 'express';
-import {
-  GetFriendRequestListDto,
-  RelationShipDto,
-  DecideFriendRequestDto,
-  GetFriendListDto,
-} from './dto/index';
+import { Request, Response } from 'express';
+import { RelationShipDto, GetFriendListDto } from './dto/index';
 
 @Controller('relationship')
 export class RelationshipController {
@@ -26,37 +25,37 @@ export class RelationshipController {
     return this.RelationShipService.AddFriend(res, dto);
   }
   //同意好友請求
-  @Post('acceptfriend')
+  @Put('acceptfriend/:id')
   @UsePipes(new ValidationPipe())
   acceptFriendRequest(
-    @Body() dto: DecideFriendRequestDto,
+    @Param('id') id: string,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.RelationShipService.AcceptFriendRequest(res, dto);
+    return this.RelationShipService.AcceptFriendRequest(
+      req.user as string,
+      res,
+      id,
+    );
   }
   //拒絕好友請求
-  @Post('rejectfriend')
+  @Delete('rejectfriend/:id')
   @UsePipes(new ValidationPipe())
   RejectFriendRequest(
-    @Body() dto: DecideFriendRequestDto,
+    @Param('id') id: string,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.RelationShipService.RejectFriendRequest(res, dto);
+    return this.RelationShipService.RejectFriendRequest(
+      req.user as string,
+      res,
+      id,
+    );
   }
-  //取得好友請求列表
-  @Get('friendrequestlist')
-  @UsePipes(new ValidationPipe())
-  GetFriendRequestList(
-    @Body() dto: GetFriendRequestListDto,
-    @Res() res: Response,
-  ) {
-    return this.RelationShipService.GetFriendsRequestList(dto, res);
-  }
-
   //取得好友列表
-  @Get('friendlist')
+  @Get()
   @UsePipes(new ValidationPipe())
   GetFriendList(@Body() dto: GetFriendListDto, @Res() res: Response) {
-    return this.RelationShipService.GetFriendList(res, dto);
+    return this.RelationShipService.GetRelationshipList(res, dto);
   }
 }

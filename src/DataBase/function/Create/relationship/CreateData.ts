@@ -5,27 +5,17 @@ export default async function createRelationshipData(
   receiveId: any,
   status: number,
 ) {
-  const create_relationship_query = `INSERT INTO relationship (userId, receiveId, status, created_at)
+  const create_relationship_query = `INSERT INTO relationship (user_id, receive_id, status, create_at)
     VALUES (?, ?, ?, ?);`;
-  const create_relationship_params = [
-    BigInt(userId),
-    BigInt(receiveId),
-    status,
-    Date.now(),
-  ];
+  const create_relationship_params = [userId, receiveId, status, Date.now()];
   const create_relationship_response = await user_datas_client.execute(
     create_relationship_query,
     create_relationship_params,
     { prepare: true },
   );
-  const friend_request_query_02 = `INSERT INTO relationship (userId, receiveId, status, created_at)
+  const friend_request_query_02 = `INSERT INTO relationship (user_id, receive_id, status, create_at)
   VALUES (?, ?, ?, ?);`;
-  const friend_request_params_02 = [
-    BigInt(receiveId),
-    BigInt(userId),
-    status + 1,
-    Date.now(),
-  ];
+  const friend_request_params_02 = [receiveId, userId, status + 1, Date.now()];
   const create_relationship_response_02 = await user_datas_client.execute(
     friend_request_query_02,
     friend_request_params_02,

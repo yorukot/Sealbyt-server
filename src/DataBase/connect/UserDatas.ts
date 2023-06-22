@@ -22,13 +22,13 @@ CREATE KEYSPACE userdatas WITH replication = {'class': 'SimpleStrategy', 'replic
 CREATE TABLE users (
   id bigint,
   email text,
-  displayName text,
+  display_name text,
   password text,
   name text,
-  createAt timestamp,
+  create_at timestamp,
   status int,
   avatar text,
-  twoFactorKey text,
+  two_factor_key text,
   factor int,
   PRIMARY KEY(id, email)
 );
@@ -38,11 +38,11 @@ CREATE INDEX user_email_idx ON users (email);
 //
 
 CREATE TABLE relationship (
-  userId bigint,
-  receiveId bigint,
+  user_id bigint,
+  receive_id bigint,
   status int,
-  createAt timestamp,
-  PRIMARY KEY(userId, receiveId)
+  create_at timestamp,
+  PRIMARY KEY(user_id, receive_id)
 )
 
 */

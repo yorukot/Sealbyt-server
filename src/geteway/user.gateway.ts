@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { RoomDto } from './dto';
 import { UserGetewayService } from './user.service';
 
-@WebSocketGateway({ namespace: 'usergeteway' })
+@WebSocketGateway({ namespace: 'usergeteway', cors: true })
 export class UserGeteway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(UserGeteway.name);
   constructor(private getewayService: UserGetewayService) {}

@@ -16,10 +16,3 @@ export class GetFriendListDto {
   @IsString()
   user_id: string;
 }
-
-export class DecideFriendRequestDto {
-  @IsString()
-  sender_user_id: string;
-  @IsString()
-  user_id: string;
-}
