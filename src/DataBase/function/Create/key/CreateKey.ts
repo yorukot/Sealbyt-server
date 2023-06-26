@@ -1,26 +1,25 @@
 import chat_datas_client from 'src/DataBase/connect/ChatDatas';
 
-export default async function CreateChatKeyExchange(
+export default async function CreateKeySecret(
   roomId: any,
   userId: any,
-  publicKey: string,
-  privateKey: string,
+  keySecret: string,
+  keyNumber: number,
 ) {
-  const create_chat_key_exchange_query = `INSERT INTO chatkeyexchange (room_id, user_id, public_key, private_key, encryption_key, create_at) VALUES (?, ?, ?, ?, ?, ?);`;
-  const create_chat_key_exchange_params = [
+  const create_chat_key_query = `INSERT INTO chatkey (room_id, user_id, key_secret, key_number, create_at) VALUES (?, ?, ?, ?, ?);`;
+  const create_chat_key_params = [
     roomId,
     userId,
-    publicKey,
-    privateKey,
-    null,
+    keySecret,
+    keyNumber,
     Date.now(),
   ];
-  const create_chat_key_exchange_response = await chat_datas_client.execute(
-    create_chat_key_exchange_query,
-    create_chat_key_exchange_params,
+  const create_chat_key_response = await chat_datas_client.execute(
+    create_chat_key_query,
+    create_chat_key_params,
     { prepare: true },
   );
-  if (create_chat_key_exchange_response.wasApplied()) {
+  if (create_chat_key_response.wasApplied()) {
     return true;
   } else {
     return false;
