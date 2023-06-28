@@ -31,7 +31,7 @@ export class AuthService {
       throw new UnauthorizedException('User or password does not exist');
     //設定新的cookies
     const accessToken = this.LogInUser(user.id);
-    const refresh_token = await this.NewRefreshToken(user.id, null);
+    const refresh_token = await this.NewRefreshToken(user.id);
     res.cookie('accessToken', accessToken, {
       expires: new Date(new Date().getTime() + 15 * 60 * 1000),
       sameSite: 'strict',
@@ -83,7 +83,7 @@ export class AuthService {
       );
     //設定cookies
     const accessToken = this.LogInUser(id);
-    const refresh_token = await this.NewRefreshToken(id, null);
+    const refresh_token = await this.NewRefreshToken(id);
     res.cookie('refreshToken', refresh_token, {
       expires: new Date(new Date().getTime() + 60 * 24 * 60 * 60 * 1000),
       sameSite: 'strict',
@@ -106,7 +106,7 @@ export class AuthService {
     //找到他的refreshtoken，如果refreshtoken找不到的話
     const refresh_token_data = await FindRefreshToken(req.cookies.refreshToken);
     //可能未來改成電子郵件通知
-    if (!refresh_token_data) throw new UnauthorizedException('Unauthorized');
+    if (!refresh_token_data) throw new UnauthorizedException('Unauthorizedaaa');
     //如果只是單存的太久沒上線
     if (Date.now() - refresh_token_data.craete_at > 5184000000)
       throw new UnauthorizedException('Unauthorized');
@@ -147,9 +147,9 @@ export class AuthService {
     });
   }
 
-  async NewRefreshToken(id: string, old_refresh_token: string | null) {
+  async NewRefreshToken(id: string, old_refresh_token?: string | null) {
     //如果有填寫old_refresh_token的話就刪除舊的refresh_token
-    if (old_refresh_token !== null) {
+    if (old_refresh_token) {
       await DeleteRefreshToken(old_refresh_token);
     }
     //創建新的refreh_token

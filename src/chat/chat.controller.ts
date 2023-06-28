@@ -36,7 +36,8 @@ export class ChatController {
     @Param('roomId') id: string,
     @Res() res: Response,
     @Query('limit') limit: number,
+    @Query('before') before_time: number,
   ) {
-    return this.charService.GetMessage(limit, id, dto, res);
+    return this.charService.GetMessage(limit, before_time, id, dto, res);
   }
 }

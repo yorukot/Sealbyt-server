@@ -27,7 +27,7 @@ CREATE TABLE chatkeyexchange (
   encryption_key text,
   create_at timestamp,
   PRIMARY KEY(room_id, user_id)
-);
+) WITH CLUSTERING ORDER BY (room_id DESC);
 
 密鑰TABLE
 CREATE TABLE chatkey (
@@ -37,21 +37,13 @@ CREATE TABLE chatkey (
   key_number int,
   create_at timestamp,
   PRIMARY KEY((room_id, user_id), create_at)
-);
+) WITH CLUSTERING ORDER BY (create_at DESC);
 
 刷新密鑰狀態
 CREATE TABLE refreshtoken (
   refresh_token text,
   create_at timestamp,
-  PRIMARY KEY( refresh_token)
-);
-
-使用者已登入資料
-CREATE TABLE loggeddevice (
-  user_id bigint,
-  data text,
-  ip text,
-  PRIMARY KEY( user_id, ip)
-)
+  PRIMARY KEY( refresh_token, create_at)
+) WITH CLUSTERING ORDER BY (create_at DESC);
 
 */

@@ -31,7 +31,7 @@ CREATE TABLE users (
   two_factor_key text,
   factor int,
   PRIMARY KEY(id, email)
-);
+) WITH CLUSTERING ORDER BY (create_at DESC);
 
 CREATE INDEX user_name_idx ON users (name);
 CREATE INDEX user_email_idx ON users (email);

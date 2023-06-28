@@ -27,7 +27,7 @@ CREATE TABLE participant (
   key_status int,
   join_at timestamp,
   PRIMARY KEY(room_id, user_id)
-);
+) WITH CLUSTERING ORDER BY (room_id DESC);
 
 CREATE INDEX participant_key_status_idx ON participant (key_status);
 
@@ -43,7 +43,7 @@ CREATE TABLE room (
   create_at timestamp,
   auto_delete int,
   PRIMARY KEY(id, create_at)
-);
+) WITH CLUSTERING ORDER BY (create_at DESC);
 
 Message資訊
 CREATE TABLE message (
@@ -59,6 +59,6 @@ CREATE TABLE message (
   create_at timestamp,
   encrypt_type int,
   PRIMARY KEY((room_id, bucket), id)
-);
+) WITH CLUSTERING ORDER BY (id DESC);
 
 */

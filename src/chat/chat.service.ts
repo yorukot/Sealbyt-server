@@ -17,6 +17,7 @@ import generateMessageId from 'src/function/generate/GenerateMessageId';
 import generateBucketId from 'src/function/generate/GenerateBucketId';
 import FindUserById from 'src/DataBase/function/Find/users/FindByid';
 import FindMessage from 'src/DataBase/function/Find/chat/FindMessage';
+import generateOldMessageId from 'src/function/generate/GenerateOldMessageId';
 
 @Injectable()
 export class ChatService {
@@ -124,6 +125,7 @@ export class ChatService {
 
   async GetMessage(
     limit: number,
+    before_time: number,
     room_id: string,
     dto: GetMessageDto,
     res: Response,
@@ -139,12 +141,17 @@ export class ChatService {
     );
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
     //取得message
-    let now_bucket_id = generateBucketId() + 1;
+    let now_bucket_id = generateBucketId(before_time) + 1;
     const message_array = [];
     while (message_array.length < limit) {
       now_bucket_id = now_bucket_id - 1;
       const find_limit = limit - message_array.length;
-      const data = await FindMessage(room_id, now_bucket_id, find_limit);
+      const data = await FindMessage(
+        room_id,
+        now_bucket_id,
+        generateOldMessageId(Number(before_time) || Date.now()),
+        find_limit,
+      );
       if (!data)
         throw new InternalServerErrorException(
           'An unidentified error occurred when find the message',
