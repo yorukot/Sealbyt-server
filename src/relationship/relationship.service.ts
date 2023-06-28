@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { RelationShipDto, GetFriendListDto } from './dto/index';
-import { UserGetewayService } from 'src/geteway/user.service';
+import { UserGetewayService } from 'src/geteway/geteway.service';
 import createRelationshipData from 'src/DataBase/function/Create/relationship/CreateData';
 import UpdateRelationshipDataSameStatus from 'src/DataBase/function/Update/relationship/UpdateDataWithSameStatus';
 import FindUsersByName from 'src/DataBase/function/Find/users/FindByName';

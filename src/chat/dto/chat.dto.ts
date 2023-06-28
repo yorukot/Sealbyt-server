@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsString, ValidateIf } from 'class-validator';
 
 export class CreateChatRoomDto {
   @IsString()
@@ -9,4 +9,23 @@ export class CreateChatRoomDto {
   room_name: string;
   @IsNumber()
   room_type: number;
+}
+
+export class SendMessageDto {
+  @IsString()
+  sender_user_id: string;
+  @IsString()
+  sender_room: string;
+  @IsString()
+  content: string;
+  @IsArray()
+  file: Array<any>;
+  @IsString()
+  @ValidateIf((object, value) => value !== null)
+  reply: string | null;
+}
+
+export class GetMessageDto {
+  @IsString()
+  user_id: string;
 }

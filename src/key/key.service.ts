@@ -12,10 +12,10 @@ import {
   UpdateKeyExchangeDto,
 } from './dto';
 import { Request, Response } from 'express';
-import FindRoom from 'src/DataBase/function/Find/chatroom/FindChatRoom';
-import FindParticipantWithBothId from 'src/DataBase/function/Find/chatroom/FindParticipantWithBothId';
+import FindRoom from 'src/DataBase/function/Find/chat/FindChatRoom';
+import FindParticipantWithBothId from 'src/DataBase/function/Find/chat/FindParticipantWithBothId';
 import CreateChatKeyExchange from 'src/DataBase/function/Create/key/CreateKeyExange';
-import UpdateChatParticipantKeyStatus from 'src/DataBase/function/Update/chatroom/UpdateChatParticipantKeyStatus';
+import UpdateChatParticipantKeyStatus from 'src/DataBase/function/Update/chat/UpdateChatParticipantKeyStatus';
 import FindKeyExchangeWithRoomId from 'src/DataBase/function/Find/key/FindKeyExchangeWithRoomId';
 import UpdateKeyExchange from 'src/DataBase/function/Update/key/UpdateKeyExchange';
 import FindKeyExchangeWithBothId from 'src/DataBase/function/Find/key/FindKeyExchangeWithBothId';
@@ -207,6 +207,7 @@ export class KeyService {
       throw new ForbiddenException(
         'You have not yet created your key on this room',
       );
+    if (key_data.length < 1) throw new NotFoundException('Key not found');
     res.status(200).json(key_data[0]);
   }
 }

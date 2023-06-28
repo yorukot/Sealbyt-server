@@ -1,4 +1,4 @@
-import chat_datas_client from 'src/DataBase/connect/ChatDatas';
+import key_datas_client from 'src/DataBase/connect/KeyDatas';
 
 export default async function CreateChatKeyExchange(
   roomId: any,
@@ -15,7 +15,7 @@ export default async function CreateChatKeyExchange(
     null,
     Date.now(),
   ];
-  const create_chat_key_exchange_response = await chat_datas_client.execute(
+  const create_chat_key_exchange_response = await key_datas_client.execute(
     create_chat_key_exchange_query,
     create_chat_key_exchange_params,
     { prepare: true },

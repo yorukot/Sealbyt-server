@@ -7,6 +7,7 @@ import {
   Res,
   Req,
   Get,
+  Ip,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto, SingUpDto } from './dto';
@@ -18,8 +19,13 @@ export class AuthController {
 
   @Post('login')
   @UsePipes(new ValidationPipe())
-  LogInLocal(@Body() dto: AuthDto, @Req() req: Request, @Res() res: Response) {
-    return this.authService.LogInLocal(dto, req, res);
+  LogInLocal(
+    @Ip() ip: string,
+    @Body() dto: AuthDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.authService.LogInLocal(dto, ip, req, res);
   }
 
   @Post('signup')
@@ -30,6 +36,10 @@ export class AuthController {
     @Res() res: Response,
   ) {
     return this.authService.SignUpLocal(dto, req, res);
+  }
+  @Get('refreshtoken')
+  RefreshToken(@Req() req: Request, @Res() res: Response) {
+    return this.authService.RefreshToken(req, res);
   }
 
   @Get('permission')

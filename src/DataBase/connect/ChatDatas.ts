@@ -18,31 +18,11 @@ export default chat_datas_client;
 創建KEYSPACE
 CREATE KEYSPACE chatdatas WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
-密鑰交換TABLE
-CREATE TABLE chatkeyexchange (
-  room_id bigint,
-  user_id bigint,
-  public_key text,
-  private_key text,
-  encryption_key text,
-  create_at timestamp,
-  PRIMARY KEY(room_id, user_id)
-);
-
-密鑰TABLE
-CREATE TABLE chatkey (
-  room_id bigint,
-  user_id bigint,
-  key_secret text,
-  key_number int,
-  create_at timestamp,
-  PRIMARY KEY((room_id, user_id), create_at)
-);
-
 使用者在room的資訊
 CREATE TABLE participant (
   room_id bigint,
   user_id bigint,
+  display_name text,
   permission int,
   key_status int,
   join_at timestamp,
@@ -73,6 +53,9 @@ CREATE TABLE message (
   user_id bigint,
   content text,
   file list<text>,
+  edited timestamp,
+  read boolean,
+  reply bigint,
   create_at timestamp,
   encrypt_type int,
   PRIMARY KEY((room_id, bucket), id)

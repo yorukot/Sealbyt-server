@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { UserGeteway } from './user.gateway';
-import { UserGetewayService } from './user.service';
+import { UserGeteway } from './geteway.gateway';
+import { UserGetewayService } from './geteway.service';
 
 @Global()
 @Module({

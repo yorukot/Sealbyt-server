@@ -5,10 +5,11 @@ export default async function CreateChatParticipant(
   userId: any,
   permission: number,
 ) {
-  const create_chat_participant_query = `INSERT INTO participant (room_id, user_id, join_at, key_status, permission) VALUES (?, ?, ?, ?, ?);`;
+  const create_chat_participant_query = `INSERT INTO participant (room_id, user_id, display_name, join_at, key_status, permission) VALUES (?, ?, ?, ?, ?, ?);`;
   const create_chat_participant_params = [
     roomId,
     userId,
+    null,
     Date.now(),
     0,
     permission,

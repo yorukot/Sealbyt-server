@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { GetewayModule } from './geteway/user.module';
+import { GetewayModule } from './geteway/geteway.module';
 import { RelationshipController } from './relationship/relationship.controller';
 import { RelationshipService } from './relationship/relationship.service';
 import { RelationshipModule } from './relationship/relationship.module';
@@ -25,7 +25,12 @@ import { ChatModule } from './chat/chat.module';
     KeyModule,
     ChatModule,
   ],
-  controllers: [AppController, RelationshipController, KeyController, ChatController],
+  controllers: [
+    AppController,
+    RelationshipController,
+    KeyController,
+    ChatController,
+  ],
   providers: [AppService, RelationshipService, KeyService, ChatService],
 })
 export class AppModule {}

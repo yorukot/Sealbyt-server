@@ -10,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RoomDto } from './dto';
-import { UserGetewayService } from './user.service';
+import { UserGetewayService } from './geteway.service';
 
 @WebSocketGateway({ namespace: 'usergeteway', cors: true })
 export class UserGeteway implements OnGatewayConnection, OnGatewayDisconnect {
