@@ -129,15 +129,16 @@ export class AuthService {
       sameSite: 'strict',
       httpOnly: true,
     });
-    res.status(200).send('SuccessFul Refresh Token.');
+    res.status(200).send('SuccessFul Refresh Token');
   }
 
   hasPermission(req: Request, res: Response) {
-    if (!JwtVerifyToken(req.cookies.accessToken)) {
-      throw new UnauthorizedException('User do not have permission.');
-    } else {
-      res.status(200).send('Permission granted.');
-    }
+    const Jwt_data = JwtVerifyToken(req.cookies.accessToken);
+    if (!Jwt_data)
+      throw new UnauthorizedException('User does not have permission');
+    if (Jwt_data.expires - Date.now() < 5 * 60 * 1000)
+      return res.status(205).send('Permission granted, but about to expire');
+    return res.status(200).send('Permission granted');
   }
 
   LogInUser(id: string) {
