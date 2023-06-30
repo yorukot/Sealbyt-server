@@ -30,6 +30,7 @@ CREATE TABLE participant (
 ) WITH CLUSTERING ORDER BY (room_id DESC);
 
 CREATE INDEX participant_key_status_idx ON participant (key_status);
+CREATE INDEX participant_user_id_idx ON participant (user_id);
 
 Room的資訊
 CREATE TABLE room (

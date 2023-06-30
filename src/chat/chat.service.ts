@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateChatRoomDto, GetMessageDto, SendMessageDto } from './dto';
+import { CreateChatRoomDto, GetDto, SendMessageDto } from './dto';
 import CreateRoomData from 'src/DataBase/function/Create/chat/createChatRoom';
 import generateRoomId from 'src/function/generate/GenerateRoomid';
 import CreateChatParticipant from 'src/DataBase/function/Create/chat/createChatparticipant';
@@ -18,10 +18,14 @@ import generateBucketId from 'src/function/generate/GenerateBucketId';
 import FindUserById from 'src/DataBase/function/Find/users/FindByid';
 import FindMessage from 'src/DataBase/function/Find/chat/FindMessage';
 import generateOldMessageId from 'src/function/generate/GenerateOldMessageId';
+import FindParticipantWithUserId from 'src/DataBase/function/Find/chat/FindParticipantWithUserId';
 
 @Injectable()
 export class ChatService {
   async CreateRoom(res: Response, create_room_dto: CreateChatRoomDto) {
+    //查看是否沒有填成員人數
+    if (create_room_dto.users.length > 0)
+      throw new ForbiddenException('Users must more than zero');
     //查看第一次加入人員是否過多
     if (create_room_dto.users.length > 20) {
       throw new ForbiddenException(
@@ -39,6 +43,9 @@ export class ChatService {
           `You are not authorized to invite this user(${user_data}) to create a room`,
         );
     });
+    //查看房間人數是否足夠
+    if (create_room_dto.room_type !== 0 && create_room_dto.users.length === 1)
+      throw new ForbiddenException('Users must more than three');
     //創建房間
     const room_id = generateRoomId();
     const create_room_data = await CreateRoomData(
@@ -127,7 +134,7 @@ export class ChatService {
     limit: number,
     before_time: number,
     room_id: string,
-    dto: GetMessageDto,
+    dto: GetDto,
     res: Response,
   ) {
     //查看limit是否正確
@@ -171,5 +178,22 @@ export class ChatService {
       if (find_limit === data.length || data.length === 0) break;
     }
     res.status(200).json(message_array);
+  }
+
+  async FindRoom(dto: GetDto, res: Response) {
+    const participant_data = await FindParticipantWithUserId(dto.user_id);
+    if (!participant_data)
+      throw new InternalServerErrorException(
+        'An unidentifiable error occurred when finding the participant',
+      );
+    const room_array = [];
+    await Promise.all(
+      participant_data.map(async (participant) => {
+        const room_data = await FindRoom(participant.room_id);
+        if (!room_data) throw new InternalServerErrorException('No room found');
+        room_array.push(room_data);
+      }),
+    );
+    res.status(200).json(room_array);
   }
 }

@@ -25,7 +25,7 @@ export class SendMessageDto {
   reply: string | null;
 }
 
-export class GetMessageDto {
+export class GetDto {
   @IsString()
   user_id: string;
 }
