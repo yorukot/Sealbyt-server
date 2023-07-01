@@ -1,5 +1,5 @@
 import {
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -24,11 +24,11 @@ import FindParticipantWithUserId from 'src/DataBase/function/Find/chat/FindParti
 export class ChatService {
   async CreateRoom(res: Response, create_room_dto: CreateChatRoomDto) {
     //查看是否沒有填成員人數
-    if (create_room_dto.users.length > 0)
-      throw new ForbiddenException('Users must more than zero');
+    if (create_room_dto.users.length === 0)
+      throw new BadRequestException('Users must more than zero');
     //查看第一次加入人員是否過多
     if (create_room_dto.users.length > 20) {
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'Adding too many members at once is not supported when creating a room',
       );
     }
@@ -45,7 +45,7 @@ export class ChatService {
     });
     //查看房間人數是否足夠
     if (create_room_dto.room_type !== 0 && create_room_dto.users.length === 1)
-      throw new ForbiddenException('Users must more than three');
+      throw new BadRequestException('Users must more than three');
     //創建房間
     const room_id = generateRoomId();
     const create_room_data = await CreateRoomData(
@@ -138,35 +138,68 @@ export class ChatService {
     res: Response,
   ) {
     //查看limit是否正確
-    if (!limit) throw new ForbiddenException('limit must be a number');
+    if (!limit) throw new BadRequestException('limit must be a number');
     if (limit > 100)
-      throw new ForbiddenException('limit must be less than 100');
+      throw new BadRequestException('limit must be less than 100');
     //查看是否有權限
     const participant_data = await FindParticipantWithBothId(
       room_id,
       dto.user_id,
     );
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
-    //取得message
+    //設定現在的bucket_id (+1是因為下面的迴圈每次執行會自動-1)
     let now_bucket_id = generateBucketId(before_time) + 1;
+    //創建message的array
     const message_array = [];
+    //創建有關這個房間的使用者的data
+    const users = {};
+    //運用迴圈取得所有的message
     while (message_array.length < limit) {
+      //將bucket - 1
       now_bucket_id = now_bucket_id - 1;
+      //取得限制limit - message_array.length是為了查看還剩下多少的訊息需要查詢
       const find_limit = limit - message_array.length;
+      //尋找訊息
       const data = await FindMessage(
         room_id,
         now_bucket_id,
         generateOldMessageId(Number(before_time) || Date.now()),
         find_limit,
       );
+      //如果找不到data的話就是在查詢過程中出現error
       if (!data)
         throw new InternalServerErrorException(
           'An unidentified error occurred when find the message',
         );
-      data.map((message) => {
+      //重複每一個訊息(主要是為了將user的資料放進去，順便把訊息塞進message_array)
+      for (const message of data) {
+        //取得使用者資料並放進users的函數
+        async function getRoomUserData() {
+          let user_data = null;
+          const participant_data = await FindParticipantWithBothId(
+            room_id,
+            message.user_id,
+          );
+          const person_data = await FindUserById(message.user_id);
+          if (person_data) {
+            user_data = {
+              user_id: participant_data
+                ? participant_data.user_id
+                : person_data.id,
+              user_display_name: participant_data
+                ? participant_data.display_name || person_data.display_name
+                : person_data.display_name,
+              user_avatar: person_data.avatar,
+            };
+            users[message.user_id] = user_data;
+          }
+        }
+        //在users沒有這個使用者，就執行查詢使用者的任務
+        if (!users[message.user_id]) await getRoomUserData();
+        //將訊息放進message_array
         message_array.push({
           message_id: message.id,
-          user_id: message.user_id,
+          user: users[message.user_id],
           content: message.content,
           file: message.file,
           edited: message.edited,
@@ -174,7 +207,8 @@ export class ChatService {
           reply: message.reply,
           create_at: message.create_at,
         });
-      });
+      }
+      //如果說找到的資料已經跟當初的限制一樣或者資料返回已經是0了就跳出迴圈 !!!!!!!!!! 這邊有問題，當中間有一段時間沒講話時會因為bucket斷掉，所以找不到訊息，應該改成重複直到限制到達或者已經到達初始bucket id
       if (find_limit === data.length || data.length === 0) break;
     }
     res.status(200).json(message_array);

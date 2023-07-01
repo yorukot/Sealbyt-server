@@ -34,7 +34,6 @@ export class UserGeteway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('newMessage')
   handleMessage(@MessageBody() body: any) {
-    console.log(body);
     this.server.emit('onMessage', {
       msg: 'New Message',
       content: body,

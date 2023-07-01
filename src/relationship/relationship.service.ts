@@ -1,7 +1,6 @@
 import {
-  BadRequestException,
   ConflictException,
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -76,7 +75,7 @@ export class RelationshipService {
     }
     //查看是否雙方已經是好友
     if (relation_request_data.status === 0)
-      throw new ForbiddenException('You are already friends with this user');
+      throw new BadRequestException('You are already friends with this user');
     //查看對方是否已經把他封鎖
     if (relation_request_data.status === 5)
       throw new NotFoundException('The user does not exist');

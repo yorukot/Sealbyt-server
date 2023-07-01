@@ -12,7 +12,7 @@ ConfigModule.forRoot();
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '16h' },
+      signOptions: { algorithm: 'HS512' },
     }),
   ],
   providers: [AuthService, JwtStrategy],

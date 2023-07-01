@@ -143,9 +143,14 @@ export class AuthService {
 
   LogInUser(id: string) {
     //返回jwt_token
-    return this.jwtService.sign({
-      id: id,
-    });
+    return this.jwtService.sign(
+      {
+        id: id,
+      },
+      {
+        expiresIn: '15m',
+      },
+    );
   }
 
   async NewRefreshToken(id: string, old_refresh_token?: string | null) {
@@ -154,10 +159,15 @@ export class AuthService {
       await DeleteRefreshToken(old_refresh_token);
     }
     //創建新的refreh_token
-    const new_refresh_token = this.jwtService.sign({
-      id: id,
-      refresh: true,
-    });
+    const new_refresh_token = this.jwtService.sign(
+      {
+        id: id,
+        refresh: true,
+      },
+      {
+        expiresIn: '60d',
+      },
+    );
     //寫入資料庫
     await CreateRefreshToken(new_refresh_token);
     //返回新的refresh_token

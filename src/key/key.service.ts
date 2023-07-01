@@ -1,5 +1,5 @@
 import {
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -27,7 +27,7 @@ export class KeyService {
   async CreateKeyExchange(key_dto: CreateKeyExchangeDto, res: Response) {
     //檢查房間是否存在
     const room_data = await FindRoom(key_dto.room_id);
-    if (!room_data) throw new ForbiddenException('Room not found');
+    if (!room_data) throw new BadRequestException('Room not found');
     const participant_data = await FindParticipantWithBothId(
       key_dto.room_id,
       key_dto.sender_user_id,
@@ -36,7 +36,7 @@ export class KeyService {
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
     //檢查密鑰是否正在交換中
     if (participant_data.key_status !== 1)
-      throw new ForbiddenException('A key is already being created');
+      throw new BadRequestException('A key is already being created');
     //創建密鑰交換
     const create_key_data = CreateChatKeyExchange(
       key_dto.room_id,
@@ -95,7 +95,7 @@ export class KeyService {
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
     //查看密鑰狀態是否符合
     if (![2, 5, 8].includes(participant_data.key_status))
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'The key exchange process has either not yet commenced or has already concluded',
       );
     //更新密鑰
@@ -127,15 +127,15 @@ export class KeyService {
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
     //找尋房間資訊(主要是為了查看加密方式)
     const room_data = await FindRoom(id);
-    if (!room_data) throw new ForbiddenException('Room not found');
+    if (!room_data) throw new BadRequestException('Room not found');
     //找到密鑰交換資訊，確保密鑰狀態正常
     const key_exchange_data = await FindKeyExchangeWithBothId(id, req.user);
     if (!key_exchange_data)
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'The key exchange process has not been initiated yet',
       );
     if (![9, 6, 3].includes(participant_data.key_status))
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'The key exchange confirm process has not been initiated yet',
       );
     //設定密要狀態要是多少
@@ -180,7 +180,7 @@ export class KeyService {
     //獲取key(確保只有創建一次)
     const key_data = await FindKey(key_dto.room_id, key_dto.sender_user_id);
     if (key_data && key_data.length > 1)
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'A key has already been created by you previously',
       );
     //創建key
@@ -204,7 +204,7 @@ export class KeyService {
     //尋找key
     const key_data = await FindKey(roomId, userId);
     if (!key_data)
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'You have not yet created your key on this room',
       );
     if (key_data.length < 1) throw new NotFoundException('Key not found');
