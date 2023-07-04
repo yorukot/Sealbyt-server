@@ -147,6 +147,9 @@ export class ChatService {
       dto.user_id,
     );
     if (!participant_data) throw new UnauthorizedException('Unauthorized');
+    //取得room資料(後面查看是否已經查到訊息開頭的時候會用到)
+    const room_data = await FindRoom(room_id);
+    if (!room_data) throw new BadRequestException('Can not find this room');
     //設定現在的bucket_id (+1是因為下面的迴圈每次執行會自動-1)
     let now_bucket_id = generateBucketId(before_time) + 1;
     //創建message的array
@@ -175,7 +178,7 @@ export class ChatService {
       for (const message of data) {
         //取得使用者資料並放進users的函數
         async function getRoomUserData() {
-          let user_data = null;
+          let user_data = message.user_data;
           const participant_data = await FindParticipantWithBothId(
             room_id,
             message.user_id,
@@ -208,8 +211,14 @@ export class ChatService {
           create_at: message.create_at,
         });
       }
+      //取得房間創建時間
+      const room_bucket_id = generateBucketId(room_data.create_at);
       //如果說找到的資料已經跟當初的限制一樣或者資料返回已經是0了就跳出迴圈 !!!!!!!!!! 這邊有問題，當中間有一段時間沒講話時會因為bucket斷掉，所以找不到訊息，應該改成重複直到限制到達或者已經到達初始bucket id
-      if (find_limit === data.length || data.length === 0) break;
+      if (
+        find_limit === data.length ||
+        (now_bucket_id <= room_bucket_id && data.length === 0)
+      )
+        break;
     }
     res.status(200).json(message_array);
   }
